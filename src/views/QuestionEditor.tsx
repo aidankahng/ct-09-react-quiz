@@ -1,5 +1,9 @@
 import { CreateQuestionType, QuestionType, UserType } from "../types";
-import { createQuestion, deleteQuestion, viewMyQuestions } from "../lib/apiWrapper";
+import {
+    createQuestion,
+    deleteQuestion,
+    viewMyQuestions,
+} from "../lib/apiWrapper";
 import { useEffect, useState } from "react";
 import MyQuestionCard from "../components/MyQuestionCard";
 
@@ -28,8 +32,7 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
             }
         }
         fetchData();
-    },[]);
-
+    }, []);
 
     const manualUpdateQuestions = async () => {
         const response = await viewMyQuestions(currentUser.token);
@@ -38,8 +41,7 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
             console.log(recievedquestions);
             setUserQuestions(recievedquestions);
         }
-    }
-
+    };
 
     const handleQuestionInputChange = (
         e: React.ChangeEvent<HTMLInputElement>
@@ -61,25 +63,22 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
                 `Your question has been created with ID: ${response.data!.id}!`
             );
         }
-        setUserQuestions([])
+        setUserQuestions([]);
         setNewQuestionData({ question: "", answer: "" });
         setChangeCounter(changeCounter + 1);
         manualUpdateQuestions();
     };
 
-    const handleDeleteQuestion = async (token:string, id:string) => {
-        let response = await deleteQuestion(token, id)
+    const handleDeleteQuestion = async (token: string, id: string) => {
+        let response = await deleteQuestion(token, id);
         if (response.error) {
             console.error(response.error);
         } else {
-            console.log(
-                `Your question with id: ${id} has been deleted!`
-            );
+            console.log(`Your question with id: ${id} has been deleted!`);
         }
         setChangeCounter(changeCounter + 1);
         manualUpdateQuestions();
-    }
-
+    };
 
     if (currentUser.token) {
         return (
@@ -120,11 +119,23 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
                         </form>
                     </div>
                     <div>
-                        <p># Questions created/edited/deleted this session: {changeCounter}</p>
+                        <p>
+                            # Questions created/edited/deleted this session:{" "}
+                            {changeCounter}
+                        </p>
                         {userQuestions.map((q) => (
                             <>
-                            <MyQuestionCard key={q.id} question={q} />
-                            <button onClick={() => handleDeleteQuestion(currentUser.token, q.id.toString())}>Delete Question</button>
+                                <MyQuestionCard key={q.id} question={q} />
+                                <button
+                                    onClick={() =>
+                                        handleDeleteQuestion(
+                                            currentUser.token,
+                                            q.id.toString()
+                                        )
+                                    }
+                                >
+                                    Delete Question
+                                </button>
                             </>
                         ))}
                     </div>
