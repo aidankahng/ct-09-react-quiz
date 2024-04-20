@@ -1,6 +1,8 @@
 import axios from "axios";
 import {
     CreateQuestionType,
+    EditQuestionType,
+    EditUserType,
     LoginType,
     QuestionId,
     QuestionType,
@@ -95,6 +97,58 @@ async function register(
     return { data, error };
 }
 
+
+// Edit User endpoint: PUT
+async function editUser(token: string,
+    sendData: EditUserType
+): Promise<APIResponse<string>> {
+    let data;
+    let error;
+    try {
+        const response = await apiClientTokenAuth(token).put(
+            userEndpoint,
+            sendData
+        );
+        data = response.data;
+        console.log('data', data)
+    } catch (err: any) {
+        //console.log(err) // TYPE: instance of AxiosError class??
+        if (err.response) {
+            console.log('axioserr', err)
+            console.log('status', err.response.status)
+            error = err?.message
+        } else {
+            error = 'Normal Error!'
+        }
+        console.log('WHEREREsDSADSADSA', error)
+        
+        // error = err?.message
+    }
+    return { data, error };
+}
+
+
+// Delete User endpoint: DELETE
+async function deleteUser(token: string): Promise<APIResponse<string>> {
+    let data;
+    let error;
+    try {
+        const response = await apiClientTokenAuth(token).delete(userEndpoint);
+        data = response.data;
+        console.log('data', data)
+    } catch (err: any) {
+        //console.log(err) // TYPE: instance of AxiosError class??
+        if (err.response) {
+            error = err?.message
+        } else {
+            error = 'Normal Error!'
+        }
+    }
+    return { data, error };
+}
+
+
+
 // Use GET along with basic auth: email:password encoded
 async function logUserIn(loginData: LoginType): Promise<APIResponse<UserType>> {
     let data;
@@ -157,6 +211,7 @@ async function viewMyQuestions(
     return { data, error };
 }
 
+// Delete question endpoint DELETE
 async function deleteQuestion(
     token: string,
     question_id: string
@@ -178,11 +233,39 @@ async function deleteQuestion(
     return { data, error };
 }
 
+// Edit question endpoint PUT
+async function editQuestion(
+    token: string,
+    question_id: string,
+    sendData: EditQuestionType
+): Promise<APIResponse<QuestionType>> {
+    let data;
+    let error;
+    try {
+        const response = await apiClientTokenAuth(token).put(
+            questionEndpoint + "/" + question_id,
+            sendData
+        );
+        data = response.data;
+    } catch (err) {
+        if (axios.isAxiosError(err)) {
+            error = err.response?.data.error;
+        } else {
+            error = "Something went wrong with retrieving questions";
+        }
+    }
+    return { data, error };
+}
+
+
 export {
     getAllQuestions,
     register,
     logUserIn,
+    editUser,
     createQuestion,
     viewMyQuestions,
     deleteQuestion,
+    editQuestion,
+    deleteUser
 };

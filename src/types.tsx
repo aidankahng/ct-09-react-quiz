@@ -11,6 +11,12 @@ export type CreateQuestionType = {
     question: string;
 }
 
+export type EditQuestionType =  {
+    answer? : string,
+    question? : string
+}
+
+
 export type QuestionId = {
     id: number
 }
@@ -33,6 +39,15 @@ export type UserType = {
     modified_on: string;
     user_id: number;
 };
+
+export type EditUserType = {
+    email?: string;
+    first_name?: string;
+    last_name?: string;
+    password?: string;
+    confirm: string;
+}
+
 
 export type LoginType = {
     email: string;

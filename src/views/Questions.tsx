@@ -14,7 +14,6 @@ export default function Questions({}: QuestionsProps) {
             const response = await getAllQuestions();
             if (response.data) {
                 let recievedquestions = response.data["questions"];
-                console.log(recievedquestions);
                 setQuestions(recievedquestions);
             }
         }

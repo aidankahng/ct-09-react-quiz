@@ -8,8 +8,10 @@ import { useEffect, useState } from "react";
 import MyQuestionCard from "../components/MyQuestionCard";
 
 type QuestionEditorProps = {
-    currentUser: UserType;
+    currentUser: Partial<UserType>;
 };
+
+
 export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
     const [changeCounter, setChangeCounter] = useState<number>(0);
 
@@ -24,24 +26,14 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
         // Code here will run ater EVERY render
         // console.log("The use effect function is running")
         async function fetchData() {
-            const response = await viewMyQuestions(currentUser.token);
+            const response = await viewMyQuestions(currentUser.token!);
             if (response.data) {
                 let recievedquestions = response.data["questions"];
-                console.log(recievedquestions);
                 setUserQuestions(recievedquestions);
             }
         }
         fetchData();
-    }, []);
-
-    const manualUpdateQuestions = async () => {
-        const response = await viewMyQuestions(currentUser.token);
-        if (response.data) {
-            let recievedquestions = response.data["questions"];
-            console.log(recievedquestions);
-            setUserQuestions(recievedquestions);
-        }
-    };
+    }, [changeCounter]);
 
     const handleQuestionInputChange = (
         e: React.ChangeEvent<HTMLInputElement>
@@ -55,7 +47,7 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
 
     const handleSubmitCreateQuestion = async (e: React.FormEvent) => {
         e.preventDefault();
-        let response = await createQuestion(newQuestionData, currentUser.token);
+        let response = await createQuestion(newQuestionData, currentUser.token!);
         if (response.error) {
             console.error(response.error);
         } else {
@@ -65,8 +57,7 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
         }
         setUserQuestions([]);
         setNewQuestionData({ question: "", answer: "" });
-        setChangeCounter(changeCounter + 1);
-        manualUpdateQuestions();
+        setChangeCounter(changeCounter + 1); // used to refresh question list
     };
 
     const handleDeleteQuestion = async (token: string, id: string) => {
@@ -76,9 +67,9 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
         } else {
             console.log(`Your question with id: ${id} has been deleted!`);
         }
-        setChangeCounter(changeCounter + 1);
-        manualUpdateQuestions();
+        setChangeCounter(changeCounter + 1); // used to refresh question list
     };
+
 
     if (currentUser.token) {
         return (
@@ -119,25 +110,16 @@ export default function QuestionEditor({ currentUser }: QuestionEditorProps) {
                         </form>
                     </div>
                     <div>
-                        <p>
-                            # Questions created/edited/deleted this session:{" "}
-                            {changeCounter}
-                        </p>
-                        {userQuestions.map((q) => (
-                            <>
-                                <MyQuestionCard key={q.id} question={q} />
-                                <button
-                                    onClick={() =>
-                                        handleDeleteQuestion(
-                                            currentUser.token,
-                                            q.id.toString()
-                                        )
-                                    }
-                                >
-                                    Delete Question
-                                </button>
-                            </>
-                        ))}
+                        <h2 style={{textAlign:'center'}}>Your Questions:</h2>
+                        <div>
+                            {userQuestions.map((q) => (
+                                <>
+                                    <MyQuestionCard key={q.id} question={q} handleDeleteQuestion={handleDeleteQuestion} currentUser={currentUser} setChangeCounter={setChangeCounter} changeCounter={changeCounter} />
+                                    
+                                </>
+                            ))}
+                        </div>
+                        
                     </div>
                 </div>
             </>

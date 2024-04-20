@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { LoginType, UserType } from "../types";
 import { logUserIn } from "../lib/apiWrapper";
+import { useNavigate } from "react-router-dom";
+
 
 type LoginProps = {
     setUser: (user: UserType) => void;
 };
 export default function Login({ setUser }: LoginProps) {
+    const navigate = useNavigate();
+
     const [loginInputData, setLoginInputData] = useState<LoginType>({
         email: "",
         password: "",
@@ -17,17 +21,22 @@ export default function Login({ setUser }: LoginProps) {
             ...loginInputData,
             [e.target.name]: e.target.value,
         });
-        console.log(loginInputData);
     };
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         let response = await logUserIn(loginInputData);
         if (response.error) {
-            console.error(response.error);
+            console.warn(response.error);
         } else {
             let newUser = response.data!;
             setUser(newUser);
+            localStorage.setItem('token', newUser.token);
+            localStorage.setItem('email', newUser.email);
+            localStorage.setItem('first_name', newUser.first_name);
+            localStorage.setItem('last_name', newUser.last_name);
+            localStorage.setItem('user_id', newUser.user_id.toString());
+            navigate('/');
         }
     };
 
